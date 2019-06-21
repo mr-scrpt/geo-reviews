@@ -15,9 +15,6 @@ export default class {
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
             await this.myApiMap.createBalloon(pointCoords, {address: pointAddress});
-            console.log(this.point);
-
-
 
         });
 
