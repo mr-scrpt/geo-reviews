@@ -22,20 +22,21 @@ module.exports = class {
         }
     }
     async createBalloon(customCoords, options) {
-        console.log(options);
-
         const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
-            '<li>{{ properties.address }}</li>'
-
+            '<li>{{ address }}</li>'
         );
 
-        this.myPlacemark = new ymaps.Placemark(customCoords,
-            options
-        , {
-            balloonContentLayout: BalloonLayout
+        let balloon = new ymaps.Balloon(this.map, {
+            layout: BalloonLayout,
+            closeButton: false
         });
-        this.map.geoObjects.add(this.myPlacemark)
 
+        await balloon.options.setParent(this.map.options);
+        await balloon.open(customCoords, options);
+
+
+    }
+    async createMark(coords){
 
     }
 }
