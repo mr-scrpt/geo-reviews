@@ -7,25 +7,24 @@ export default class {
     async init(){
         this.yandexApi = await this.myApiMap.initMap({
             center: [50, 36.24],
-            zoom: 12,
+            zoom: 15,
             controls: []
         });
         this.yandexApi.events.add('click', async e => {
             this.point = await this.myApiMap.getMapPosition(e);
-            const coords = await this.myApiMap.createPoint(this.point.coords);
-            this.yandexApi.geoObjects.add(coords);
+            const pointCoords = this.point.coords;
+            const pointAddress = this.point.address;
+            await this.myApiMap.createBalloon(pointCoords, {address: pointAddress});
+            console.log(this.point);
+
+
 
         });
 
 
-        //this.test = await this.myApiMap.createPoint([50, 36.28]);
-
-        //await this.yandexApi.geoObjects.add(this.test);
-        // console.log(this.test);
 
 
-
-       // this.Balloon = await this.myApiMap.createBalloon(this.position);
+       //this.Balloon = await this.myApiMap.createBalloon(this.position);
 
 
 

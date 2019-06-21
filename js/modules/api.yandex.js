@@ -21,31 +21,21 @@ module.exports = class {
             address
         }
     }
-    async createBalloon(options, customCoords) {
+    async createBalloon(customCoords, options) {
+        console.log(options);
 
-        var BalloonLayout = await ymaps.templateLayoutFactory.createClass(
-            '<div> {ddjdjdj}</div>'
-        )
-    }
-    async createPoint (coords) {
-        return new ymaps.GeoObject({
-            // Описание геометрии.
-            geometry: {
-                type: "Point",
-                coordinates: coords
-            },
-            // Свойства.
-            properties: {
-                // Контент метки.
-                iconContent: 'Я тащусь',
-                hintContent: 'Ну давай уже тащи'
-            }
-        }, {
-            // Опции.
-            // Иконка метки будет растягиваться под размер ее содержимого.
-            //preset: 'islands#blackStretchyIcon',
-            // Метку можно перемещать.
-            //draggable: true
-        })
+        const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
+            '<li>{{ properties.address }}</li>'
+
+        );
+
+        this.myPlacemark = new ymaps.Placemark(customCoords,
+            options
+        , {
+            balloonContentLayout: BalloonLayout
+        });
+        this.map.geoObjects.add(this.myPlacemark)
+
+
     }
 }
