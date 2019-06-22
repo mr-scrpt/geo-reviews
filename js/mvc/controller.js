@@ -1,4 +1,4 @@
-const Map = require('../modules/api.yandex')
+const Map = require('../modules/api.yandex');
 export default class {
     constructor(){
         this.myApiMap = new Map();
@@ -11,10 +11,22 @@ export default class {
             controls: []
         });
         this.yandexApi.events.add('click', async e => {
+            if (this.balloon) {
+                this.balloon.close();
+            }
+
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
-            await this.myApiMap.createBalloon(pointCoords, {address: pointAddress});
+            const data = {
+                address: pointAddress,
+                reviews: []
+            };
+            this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
+
+
+
+
 
         });
 
