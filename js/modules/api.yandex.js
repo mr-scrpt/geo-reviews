@@ -23,13 +23,10 @@ module.exports = class {
     }
     async createBalloon(customCoords, options) {
         const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
-
-            '<li>{{ address }}</li>' +
-
             '<div class="pupup">'+
                 '<div class="popup__inner">'+
                     '<div class="popup__header">'+
-                        '<div class="popup__address"></div>'+
+                        '<div class="popup__address">{{ address }}</div>'+
                         '<div class="popup__close">'+
                             '<button class="popup__close">x</button>'+
                         '</div>'+
@@ -38,25 +35,24 @@ module.exports = class {
                         '<div class="reviews__list">'+
                             '<div class="reviews__item">'+
                                 '<div class="reviews__header">'+
-                                    '<span class="reviews__author">'+
-                                        '<span class="reviews__author-name">Светлана</span>'+
-                                        '<span class="reviews__author-last-name">Тутут</span>'+
-                                    '</span>'+
-                                    '<div class="reviews__data">13.12.2019</div>'+
+                                    '<span class="reviews__author">Светлана</span>'+
+                                    '<span class="reviews__spot">Тутут</span>'+
+                                    '<span class="reviews__data">13.12.2019</span>'+
                                 '</div>'+
-                                '<div class="reviews__author">Отличное место! Всем советую</div>'+
+                                '<div class="reviews__text">Отличное место! Всем советую</div>'+
                             '</div>'+
+
+
                         '</div>'+
                         '<div class="reviews__body">'+
                             '<form class="reviews__form form">'+
                                 '<div class="form__title">Ваш отзыв</div>'+
+                                '<input type="hidden" class="input form__coords" value="{{ coords }}">'+
                                 '<input type="text" class="input form__name" name="name" placeholder="Ваше имя">'+
                                 '<input type="text" class="input form__spot" name="spot" placeholder="Укажите место">'+
                                 '<textarea name="comment" id="" cols="30" rows="10" class="textarea form__comment"></textarea>'+
                                 '<div class="form__action">'+
-                                    '<button class="button form__button">'+
-                                        '<span class="button__text">Добавить</span>'+
-                                    ' </button>'+
+                                    '<button class="button form__button" type="button">Добавить</button>'+
                                 '</div>'+
                             '</form>'+
                         '</div>'+
@@ -68,7 +64,7 @@ module.exports = class {
 
         );
 
-        let balloon = new ymaps.Balloon(this.map, {
+        const balloon = new ymaps.Balloon(this.map, {
             layout: BalloonLayout,
             closeButton: false
         });
@@ -76,10 +72,17 @@ module.exports = class {
         await balloon.options.setParent(this.map.options);
         await balloon.open(customCoords, options);
 
+        await this.map.setCenter(customCoords);
+
         return balloon;
     }
 
-    async closeBalloon(){
-        await this.map.balloon.close();
+    async createCluster(){
+        const clusterer = new ymaps.Clusterer({
+            groupByCoordinates: false,
+            clusterDisableClickZoom: true,
+            clusterHideIconOnBalloonOpen: false,
+            geoObjectHideIconOnBalloonOpen: false
+        });
     }
 }
