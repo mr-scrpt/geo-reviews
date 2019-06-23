@@ -1,4 +1,5 @@
 module.exports = class {
+
     initMap(settings){
         return new Promise((resolve, reject) => ymaps.ready(resolve))
             .then(()=>{
@@ -32,18 +33,7 @@ module.exports = class {
                         '</div>'+
                     '</div>'+
                     '<div class="popup__reviews reviews">'+
-                        '<div class="reviews__list">'+
-                            '<div class="reviews__item">'+
-                                '<div class="reviews__header">'+
-                                    '<span class="reviews__author">Светлана</span>'+
-                                    '<span class="reviews__spot">Тутут</span>'+
-                                    '<span class="reviews__data">13.12.2019</span>'+
-                                '</div>'+
-                                '<div class="reviews__text">Отличное место! Всем советую</div>'+
-                            '</div>'+
 
-
-                        '</div>'+
                         '<div class="reviews__body">'+
                             '<form class="reviews__form form">'+
                                 '<div class="form__title">Ваш отзыв</div>'+
@@ -77,12 +67,72 @@ module.exports = class {
         return balloon;
     }
 
-    async createCluster(){
+    async createCluster(points, data){
+
+        console.log(data);
         const clusterer = new ymaps.Clusterer({
             groupByCoordinates: false,
             clusterDisableClickZoom: true,
             clusterHideIconOnBalloonOpen: false,
             geoObjectHideIconOnBalloonOpen: false
         });
+
+
+        const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
+            '<div class="pupup">'+
+            '<div class="popup__inner">'+
+            '<div class="popup__header">'+
+            '<div class="popup__address">{{ properties.address }} </div>'+
+            '<div class="popup__close">'+
+            '<button class="popup__close">x</button>'+
+            '</div>'+
+            '</div>'+
+            '<div class="popup__reviews reviews">'+
+            '<div class="reviews__list">'+
+            '<div class="reviews__item">'+
+            '<div class="reviews__header">'+
+            '<span class="reviews__author">Светлана</span>'+
+            '<span class="reviews__spot">Тутут</span>'+
+            '<span class="reviews__data">13.12.2019</span>'+
+            '</div>'+
+            '<div class="reviews__text">Отличное место! Всем советую</div>'+
+            '</div>'+
+
+
+            '</div>'+
+            '<div class="reviews__body">'+
+            '<form class="reviews__form form">'+
+            '<div class="form__title">Ваш отзыв</div>'+
+            '<input type="hidden" class="input form__coords" value="{{ coords }}">'+
+            '<input type="text" class="input form__name" name="name" placeholder="Ваше имя">'+
+            '<input type="text" class="input form__spot" name="spot" placeholder="Укажите место">'+
+            '<textarea name="comment" id="" cols="30" rows="10" class="textarea form__comment"></textarea>'+
+            '<div class="form__action">'+
+            '<button class="button form__button" type="button">Добавить</button>'+
+            '</div>'+
+            '</form>'+
+            '</div>'+
+            '</div>'+
+            '</div>'+
+            '</div>'
+        );
+
+
+        let geoObjects = [];
+
+        for( let i = 0, len = points.length; i < len; i++) {
+            geoObjects[i] = new ymaps.Placemark(points[i], data[i], {balloonContentLayout: BalloonLayout});
+        }
+
+        clusterer.options.set({
+            gridSize: 80,
+            clusterDisableClickZoom: true
+
+        });
+
+        clusterer.add(geoObjects);
+
+        this.map.geoObjects.add(clusterer);
+
     }
 }

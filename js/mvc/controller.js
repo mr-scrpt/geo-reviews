@@ -1,7 +1,10 @@
 const Map = require('../modules/api.yandex');
+const Sm = require('../modules/sm');
+
 export default class {
     constructor(){
         this.myApiMap = new Map();
+        this.sm = new Sm();
         this.init();
     }
     async init(){
@@ -27,6 +30,9 @@ export default class {
             this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
             
         });
+
+
+        this.myApiMap.createCluster(this.sm.getPoints(), this.sm.parseStorage());
         
         document.body.addEventListener('click', e => {
             if (e.target.classList.contains('button')){
@@ -62,7 +68,8 @@ export default class {
                         'address': address,
                         'name': name,
                         'spot': spot,
-                        'comment': comment
+                        'comment': comment,
+                        'yandexMapPointsObject': true
                     };
                     localStorage.setItem(data.address, JSON.stringify(data));
                 }
