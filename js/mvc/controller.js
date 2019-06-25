@@ -18,6 +18,8 @@ export default class {
                 this.balloon.close();
             }
 
+            console.log(e.target);
+
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
@@ -35,6 +37,8 @@ export default class {
         this.myApiMap.createCluster(this.sm.getPoints(), this.sm.parseStorage());
         
         document.body.addEventListener('click', e => {
+
+
             if (e.target.classList.contains('button')){
                 e.preventDefault();
                 const address = document.querySelector('.popup__address').innerText;
@@ -66,12 +70,19 @@ export default class {
                     const data = {
                         'coords': coords,
                         'address': address,
-                        'name': name,
-                        'spot': spot,
-                        'comment': comment,
-                        'yandexMapPointsObject': true
+                        'reviews': [
+                            {
+                                'name': name,
+                                'spot': spot,
+                                'comment': comment
+                            }
+                        ],
+                        'yandexMapPointsObject': true,
+
                     };
-                    localStorage.setItem(data.address, JSON.stringify(data));
+                    //localStorage.setItem(data.address, JSON.stringify(data));
+                    this.sm.commentAdd(data.address, data);
+                    this.myApiMap.createCluster(this.sm.getPoints(), this.sm.parseStorage());
                 }
             }
         })

@@ -12,8 +12,6 @@ module.exports = class {
                 arrData.push(value);
             }
         }
-
-        //console.log(arrData);
         return arrData;
 
     }
@@ -27,6 +25,22 @@ module.exports = class {
     }
 
 
+    commentAdd(name, data){
+        let spot = localStorage[name];
+        // Если место еще не добавлено в localstorage, то добавляем ему отзыв
+        if(!spot){
+            console.log('новый адрес!');
+            localStorage.setItem(name, JSON.stringify(data));
+            console.log(data);
+        }else { // Если место существует в localstorage, то добавляем к уде имеющимся отзывам - новый
 
+            let reviews = JSON.parse(spot);
+            let allComment = reviews.reviews;
+            //data.reviews = data.reviews.concat(allComment);
+            data.reviews = [ ...data.reviews, ...allComment];
+
+            localStorage.setItem(name, JSON.stringify(data))
+        }
+    }
 
 }
