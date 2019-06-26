@@ -30,9 +30,10 @@ module.exports = class {
             address
         }
     };
-    async createBalloon(customCoords, coords, options) {
+    async createBalloon(customCoords, options) {
         const clusterNew = this.clusster;
         const mapName = this.map;
+
         const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
             '<div class="popup">'+
             '<div class="popup__inner">'+
@@ -66,7 +67,7 @@ module.exports = class {
             '</div>'+
             '</div>'+
             '</div>', {
-                build: function () {
+                build() {
                     BalloonLayout.superclass.build.call(this);
                     const buttonAdd = document.getElementById("addReview");
                     const buttonClose = document.querySelector(".popup__close");
@@ -86,7 +87,8 @@ module.exports = class {
 
                     buttonAdd.addEventListener('click', e => {
                         e.preventDefault();
-                        this.addPlacemark();
+                        this.addPlacemark(customCoords, options);
+
                     });
 
                     clusterNew.events.add('click', (e)=>{
@@ -94,22 +96,11 @@ module.exports = class {
                     });
 
                 },
-                addPlacemark: function (coords = customCoords) {
+                async addPlacemark (coords = customCoords) {
                     const that = this;
-
-
-                    var myPlacemark = new ymaps.Placemark(
-                        customCoords, {
-                            balloonContentHeader: ``,
-                            balloonContentBody: ``,
-                            balloonContentFooter:``
-                        }, {
-                            layout: BalloonLayout,
-                            balloonPanelMaxMapArea: 0,
-                            hasBalloon: false,
-
-
-                        }
+                    console.log('создание метки');
+                    const myPlacemark = new ymaps.Placemark(
+                        coords
                     );
 
                     clusterNew.add(myPlacemark);
@@ -123,13 +114,15 @@ module.exports = class {
         );
 
 
-        let balloon = await new ymaps.Balloon(this.map, {
-            layout: BalloonLayout,
 
+        let balloon = await new ymaps.Balloon(this.map, {
+            layout: BalloonLayout
         });
         await balloon.options.setParent(this.map.options);
 
-        await balloon.open(customCoords);
+
+        console.log(options);
+        await balloon.open(customCoords, options);
         return {
             balloon,
             clusterNew
@@ -138,4 +131,37 @@ module.exports = class {
 
     };
 
-}
+    /*async addPlacemark () {
+        //const that = this;
+        const clusterNew = this.clusster;
+        const mapName = this.map;
+
+
+        const BalloonContentLayout = ymaps.templateLayoutFactory.createClass(
+            '<div style="margin: 10px;">' +
+            '<b>{{properties.name}}</b><br />' +
+            '<i id="count"></i> ' +
+            '<button id="counter-button"> +1 </button>' +
+            '</div>');
+
+
+        const placemark = new ymaps.Placemark([50, 36.24], {
+            name: 'Считаем'
+        }, {
+            layout: BalloonContentLayout,
+            // Запретим замену обычного балуна на балун-панель.
+            // Если не указывать эту опцию, на картах маленького размера откроется балун-панель.
+            balloonPanelMaxMapArea: 0
+        });
+
+       // mapName.geoObjects.add(placemark);
+
+        clusterNew.add(placemark);
+        mapName.geoObjects.add(clusterNew);
+
+
+
+
+    }*/
+
+};
