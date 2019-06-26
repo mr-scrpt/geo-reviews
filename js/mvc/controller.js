@@ -8,15 +8,13 @@ export default class {
         this.init();
     }
     async init(){
-        this.yandexApi = await this.myApiMap.initMap({
+        [this.yandexApi, this.cluster] = await this.myApiMap.initMap({
             center: [50, 36.24],
             zoom: 15,
             controls: [] 
         });
         this.yandexApi.events.add('click', async e => {
-
             this.point = await this.myApiMap.getMapPosition(e);
-
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
             const data = {
@@ -26,13 +24,28 @@ export default class {
             };
             if (this.balloon) {
                 this.balloon.balloon.close();
+                console.log('тут');
             }
-            console.log('тут');
+
             this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
 
 
         });
-        //this.myApiMap.addPlacemark();
+
+        this.cluster.events.add('click', async e => {
+            if (this.balloon) {
+                this.balloon.balloon.close();
+                console.log('тут');
+            }
+
+            var object = e.get('target');
+            // Тут заберем данные из локалсторедж и поло
+            if (!object.getGeoObjects) {
+                this.balloon = this.myApiMap.createBalloon(object.geometry._coordinates, {address: '22222222'})
+
+            }
+
+        });
 
         //this.myApiMap.createCluster(this.sm.getPoints(), this.sm.parseStorage());
 

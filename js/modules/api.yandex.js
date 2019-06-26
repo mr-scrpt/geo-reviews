@@ -4,20 +4,22 @@ module.exports = class {
         return new Promise((resolve, reject) => ymaps.ready(resolve))
             .then(()=>{
                 this.map = new ymaps.Map('map', settings);
-                this.clusster = new ymaps.Clusterer({
+                this.cluster = new ymaps.Clusterer({
                     clusterDisableClickZoom: true,
                     clusterBalloonContentLayout: 'cluster#balloonCarousel'
                 });
 
-                this.clusster.events.add('click', async e => {
-                    var object = e.get('target');
-                    if (!object.getGeoObjects) {
-                        this.createBalloon(object.geometry._coordinates)
-                    }
+                // this.cluster.events.add('click', async e => {
+                //     var object = e.get('target');
+                //     // Тут заберем данные из локалсторедж и поло
+                //     if (!object.getGeoObjects) {
+                //         this.createBalloon(object.geometry._coordinates, {address: '22222222'})
+                //
+                //     }
+                //
+                // });
 
-                });
-
-                return this.map
+                return [this.map, this.cluster];
             })
     };
     async getMapPosition(e) {
@@ -31,7 +33,7 @@ module.exports = class {
         }
     };
     async createBalloon(customCoords, options) {
-        const clusterNew = this.clusster;
+        const clusterNew = this.cluster;
         const mapName = this.map;
 
         const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
