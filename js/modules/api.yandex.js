@@ -9,6 +9,14 @@ module.exports = class {
                     clusterBalloonContentLayout: 'cluster#balloonCarousel'
                 });
 
+                this.clusster.events.add('click', async e => {
+                    var object = e.get('target');
+                    if (!object.getGeoObjects) {
+                        this.createBalloon(object.geometry._coordinates)
+                    }
+
+                });
+
                 return this.map
             })
     };
@@ -22,15 +30,15 @@ module.exports = class {
             address
         }
     };
-    async createBalloon(customCoords, options) {
+    async createBalloon(customCoords, coords, options) {
+        const clusterNew = this.clusster;
+        const mapName = this.map;
         const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
-            '<div class="pupup">'+
+            '<div class="popup">'+
             '<div class="popup__inner">'+
             '<div class="popup__header">'+
             '<div class="popup__address">{{ address }}</div>'+
-            '<div class="popup__close">'+
-            '<button class="popup__close">x</button>'+
-            '</div>'+
+            '<button class="popup__close" id="popup__close">x</button>'+
             '</div>'+
             '<div class="popup__reviews reviews">'+
             '{% for review in reviews %}' +
@@ -51,112 +59,83 @@ module.exports = class {
             '<input type="text" class="input form__spot" name="spot" placeholder="Укажите место">'+
             '<textarea name="comment" id="" cols="30" rows="10" class="textarea form__comment"></textarea>'+
             '<div class="form__action">'+
-            '<button class="button form__button" type="button">Добавить</button>'+
+            '<button class="button form__button" id="addReview" type="button">Добавить</button>'+
             '</div>'+
             '</form>'+
             '</div>'+
             '</div>'+
             '</div>'+
-            '</div>'
-
-
-
-        );
-
-        const balloon = new ymaps.Balloon(this.map, {
-            layout: BalloonLayout,
-            //closeButton: false
-        });
-
-        await balloon.options.setParent(this.map.options);
-        await balloon.open(customCoords, options);
-
-        await this.map.setCenter(customCoords);
-
-        return balloon;
-    };
-
-    async createCluster(points, data){
-
-        const clusterer = new ymaps.Clusterer({
-            groupByCoordinates: false,
-            clusterDisableClickZoom: true,
-            clusterHideIconOnBalloonOpen: false,
-            geoObjectHideIconOnBalloonOpen: false
-        });
-
-
-        const BalloonLayout = await ymaps.templateLayoutFactory.createClass(
-            '<div class="popup">'+
-            '<div class="popup__inner">'+
-            '<div class="popup__header">'+
-            '<div class="popup__address">{{ properties.address }} </div>'+
-
-            '<a class="popup__close" href="#">&times;</a>' +
-
-            '</div>'+
-            '<div class="popup__reviews reviews">'+
-            '<div class="reviews__list">'+
-
-            '{% for review in properties.reviews %}' +
-            '<div class="reviews__item">'+
-            '<div class="reviews__header">'+
-            '<span class="reviews__author">{{review.name}}</span>'+
-            '<span class="reviews__spot">{{review.spot}}</span>'+
-            '<span class="reviews__data">13.12.2019</span>'+
-            '</div>'+
-            '<div class="reviews__text">{{review.comment}}</div>'+
-            '</div>'+
-            '{% endfor %}' +
-
-            '</div>'+
-            '<div class="reviews__body">'+
-            '<form class="reviews__form form">'+
-            '<div class="form__title">Ваш отзыв</div>'+
-            '<input type="hidden" class="input form__coords" value="{{ coords }}">'+
-            '<input type="text" class="input form__name" name="name" placeholder="Ваше имя">'+
-            '<input type="text" class="input form__spot" name="spot" placeholder="Укажите место">'+
-            '<textarea name="comment" id="" cols="30" rows="10" class="textarea form__comment"></textarea>'+
-            '<div class="form__action">'+
-            '<button class="button form__button" type="button">Добавить</button>'+
-            '</div>'+
-            '</form>'+
-            '</div>'+
-            '</div>'+
-            '</div>'+
-            '</div>',{
+            '</div>', {
                 build: function () {
-                    this.constructor.superclass.build.call(this);
-                    this._$element = $('.popup', this.getParentElement());
-                    this._$element.find('.popup__close').on('click', $.proxy(this.onCloseClick, this));
+                    BalloonLayout.superclass.build.call(this);
+                    const buttonAdd = document.getElementById("addReview");
+                    const buttonClose = document.querySelector(".popup__close");
+
+
+                    buttonClose.addEventListener('click', e => {
+                        e.preventDefault();
+                        this.events.fire('userclose');
+                    });
+
+
+                    document.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+
+                    });
+
+                    buttonAdd.addEventListener('click', e => {
+                        e.preventDefault();
+                        this.addPlacemark();
+                    });
+
+                    clusterNew.events.add('click', (e)=>{
+
+                    });
+
+                },
+                addPlacemark: function (coords = customCoords) {
+                    const that = this;
+
+
+                    var myPlacemark = new ymaps.Placemark(
+                        customCoords, {
+                            balloonContentHeader: ``,
+                            balloonContentBody: ``,
+                            balloonContentFooter:``
+                        }, {
+                            layout: BalloonLayout,
+                            balloonPanelMaxMapArea: 0,
+                            hasBalloon: false,
+
+
+                        }
+                    );
+
+                    clusterNew.add(myPlacemark);
+                    mapName.geoObjects.add(clusterNew);
+
+                    return [myPlacemark, clusterNew];
                 }
 
-            }
 
+            }
         );
 
 
-        let geoObjects = [];
-
-        for( let i = 0, len = points.length; i < len; i++) {
-            // geoObjects[i] = new ymaps.Placemark(points[i], data[i], {balloonContentLayout: BalloonLayout});
-            data[i]['iconContent']= data[i].reviews.length;
-            geoObjects[i] = new ymaps.Placemark(points[i], data[i], {balloonContentLayout: BalloonLayout});
-        }
-
-        clusterer.options.set({
-            gridSize: 80,
-            clusterDisableClickZoom: true
+        let balloon = await new ymaps.Balloon(this.map, {
+            layout: BalloonLayout,
 
         });
+        await balloon.options.setParent(this.map.options);
 
-        clusterer.add(geoObjects);
+        await balloon.open(customCoords);
+        return {
+            balloon,
+            clusterNew
+        };
 
-        this.map.geoObjects.add(clusterer);
 
     };
 
-    async creatrMark(option){
-        this.map
-    };
 }
