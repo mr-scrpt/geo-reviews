@@ -24,8 +24,9 @@ export default class {
             };
             if (this.balloon) {
                 this.balloon.balloon.close();
-                console.log('тут');
+                console.log('балун карты');
             }
+
 
             this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
 
