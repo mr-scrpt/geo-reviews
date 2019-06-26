@@ -35,14 +35,15 @@ export default class {
 
         this.cluster.events.add('click', async e => {
             if (this.balloon) {
+                console.log(this.balloon);
                 this.balloon.balloon.close();
-                console.log('тут');
+
             }
 
             var object = e.get('target');
             // Тут заберем данные из локалсторедж и поло
             if (!object.getGeoObjects) {
-                this.balloon = this.myApiMap.createBalloon(object.geometry._coordinates, {address: '22222222'})
+                this.balloon = await this.myApiMap.createBalloon(object.geometry._coordinates, {address: '22222222'})
 
             }
 
@@ -95,7 +96,7 @@ export default class {
                     //localStorage.setItem(data.address, JSON.stringify(data));
                     this.sm.commentAdd(data.address, data);
                     //this.balloon = await this.myApiMap.createBalloon(data.coords, data);
-                    console.log(data.coords, data);
+                    // console.log(data.coords, data);
                     //this.myApiMap.createCluster(this.sm.getPoints(), this.sm.parseStorage());
                 }
             }
