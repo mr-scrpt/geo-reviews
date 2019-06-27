@@ -9,16 +9,6 @@ module.exports = class {
                     clusterBalloonContentLayout: 'cluster#balloonCarousel'
                 });
 
-                // this.cluster.events.add('click', async e => {
-                //     var object = e.get('target');
-                //     // Тут заберем данные из локалсторедж и поло
-                //     if (!object.getGeoObjects) {
-                //         this.createBalloon(object.geometry._coordinates, {address: '22222222'})
-                //
-                //     }
-                //
-                // });
-
                 return [this.map, this.cluster];
             })
     };
@@ -84,23 +74,23 @@ module.exports = class {
                     document.addEventListener('click', function (e) {
                         e.preventDefault();
 
-
                     });
 
                     buttonAdd.addEventListener('click', e => {
                         e.preventDefault();
-                        this.addPlacemark(customCoords, options);
+                        console.log(options);
+                        //this.addPlacemark(customCoords, options);
 
                     });
 
                     clusterNew.events.add('click', (e)=>{
-
+                        this.events.fire('userclose');
                     });
 
                 },
                 async addPlacemark (coords = customCoords) {
                     const that = this;
-                    console.log('создание метки');
+
                     const myPlacemark = new ymaps.Placemark(
                         coords
                     );
@@ -123,7 +113,7 @@ module.exports = class {
         await balloon.options.setParent(this.map.options);
 
 
-        console.log(options);
+
         await balloon.open(customCoords, options);
         return {
             balloon,

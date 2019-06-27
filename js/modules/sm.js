@@ -15,6 +15,18 @@ module.exports = class {
         return arrData;
 
     }
+
+
+
+    createCluster(){
+
+    }
+
+
+
+
+
+
     getPoints(){
         let data = this.parseStorage();
         let points = [];
