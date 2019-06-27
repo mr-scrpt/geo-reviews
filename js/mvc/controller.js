@@ -16,6 +16,7 @@ export default class {
 
 
         const points = await this.sm.parseStorage();
+
         for(let point of points){
             let reviews = point.reviews;
             reviews.forEach(async review=>{
@@ -29,6 +30,7 @@ export default class {
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
+            console.log(pointAddress);
             const data = {
                 address: pointAddress,
                 coords: pointCoords,
@@ -42,13 +44,19 @@ export default class {
         });
 
         this.cluster.events.add('click', async e => {
+            this.point = await this.myApiMap.getMapPosition(e);
+            const pointAddress = await this.point.address;
+            const data = await localStorage.getItem(pointAddress);
+            console.log(pointAddress);
+
+
             if (this.balloon) {
                 this.balloon.balloon.close();
             }
             const object = e.get('target');
             // Тут заберем данные из локалсторедж и поло
             if (!object.getGeoObjects) {
-                this.balloon = await this.myApiMap.createBalloon(object.geometry._coordinates, {address: '22222222'})
+                this.balloon = await this.myApiMap.createBalloon(object.geometry._coordinates, JSON.parse(data))
 
             }
 
@@ -65,6 +73,7 @@ export default class {
                 const name = document.querySelector('.form__name').value;
                 const spot = document.querySelector('.form__spot').value;
                 const comment = document.querySelector('.form__comment').value;
+                const reviewsList = document.querySelector('.reviews__list');
 
                 const form = document.querySelector('.form');
 
@@ -86,6 +95,17 @@ export default class {
                 });
 
                 if (!isEmpty){
+                    const dataComment = new Date();
+                    const dataOptions = {
+                        year: 'numeric',
+                        month: 'numeric',
+
+                        weekday: 'long',
+                        timezone: 'UTC',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric'
+                    };
                     const data = {
                         'coords': coords,
                         'address': address,
@@ -93,13 +113,15 @@ export default class {
                             {
                                 'name': name,
                                 'spot': spot,
-                                'comment': comment
+                                'comment': comment,
+                                'data': dataComment.toLocaleString("ru", dataOptions)
                             }
                         ],
                         'yandexMapPointsObject': true,
 
                     };
-
+                    // console.log(this.sm.newComment(data.reviews));
+                    reviewsList.innerHTML = this.sm.newComment(data.reviews);
                     await this.sm.commentAdd(data.address, data);
                     await this.createCluster(data.coords, this.yandexApi, this.cluster);
 

@@ -30,23 +30,27 @@ module.exports = class {
             '<div class="popup">'+
             '<div class="popup__inner">'+
             '<div class="popup__header">'+
-            '<div class="popup__address">{{ address }}</div>'+
+            '<div class="popup__address">{{ address }} </div>'+
             '<button class="popup__close" id="popup__close">x</button>'+
             '</div>'+
             '<div class="popup__reviews reviews">'+
+            '<div class="reviews__list">'+
+                '{% if !reviews.length %}' +
+                'Отзывов нет!'+
+                '{% endif %}'+
             '{% for review in reviews %}' +
             '<div class="reviews__item">'+
             '<div class="reviews__header">'+
             '<span class="reviews__author">{{review.name}}</span>'+
             '<span class="reviews__spot">{{review.spot}}</span>'+
-            '<span class="reviews__data">13.12.2019</span>'+
+            '<span class="reviews__data">{{review.data}}</span>'+
             '</div>'+
             '<div class="reviews__text">{{review.comment}}</div>'+
             '</div>'+
             '{% endfor %}' +
+            '</div>'+
             '<div class="reviews__body">'+
             '<form class="reviews__form form">'+
-            '<div class="form__title">Ваш отзыв</div>'+
             '<input type="hidden" class="input form__coords" value="{{ coords }}">'+
             '<input type="text" class="input form__name" name="name" placeholder="Ваше имя">'+
             '<input type="text" class="input form__spot" name="spot" placeholder="Укажите место">'+
@@ -78,7 +82,7 @@ module.exports = class {
 
                     buttonAdd.addEventListener('click', e => {
                         e.preventDefault();
-                        console.log(options);
+
                         //this.addPlacemark(customCoords, options);
 
                     });

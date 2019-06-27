@@ -16,7 +16,23 @@ module.exports = class {
 
     }
 
+    newComment(data){
+        let [review] = data;
+        const reviewsItem = `
+            <div class="reviews__item">
+                <div class="reviews__header">
+                <span class="reviews__author">${review.name}</span>
+                <span class="reviews__spot">${review.spot}</span>
+                <span class="reviews__data">${review.data}</span>
+                </div>
+                <div class="reviews__text">${review.comment}</div>
+            </div>
+          
+        `;
 
+        return reviewsItem;
+
+    }
 
     getPoints(){
         let data = this.parseStorage();
