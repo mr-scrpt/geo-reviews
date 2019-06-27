@@ -18,15 +18,6 @@ module.exports = class {
 
 
 
-    createCluster(){
-
-    }
-
-
-
-
-
-
     getPoints(){
         let data = this.parseStorage();
         let points = [];

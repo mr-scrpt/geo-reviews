@@ -14,6 +14,17 @@ export default class {
             controls: [] 
         });
 
+
+        const points = await this.sm.parseStorage();
+        for(let point of points){
+            let reviews = point.reviews;
+            reviews.forEach(async review=>{
+                await this.createCluster(point.coords, this.yandexApi, this.cluster);
+            });
+
+        }
+
+
         this.yandexApi.events.add('click', async e => {
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
@@ -25,13 +36,9 @@ export default class {
             };
             if (this.balloon) {
                 this.balloon.balloon.close();
-
             }
 
-
             this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
-
-
         });
 
         this.cluster.events.add('click', async e => {
@@ -92,14 +99,9 @@ export default class {
                         'yandexMapPointsObject': true,
 
                     };
-                    // this.yandexApi.addPlacemark(data.coords, data);
-
-                    const placemark = new ymaps.Placemark(data.coords);
-                    this.cluster.add(placemark);
-                    this.yandexApi.geoObjects.add(this.cluster);
 
                     await this.sm.commentAdd(data.address, data);
-                    //this.createCluster(data.coords, this.yandexApi, this.cluster)
+                    await this.createCluster(data.coords, this.yandexApi, this.cluster);
 
                 }
             }
@@ -109,10 +111,9 @@ export default class {
 
     }
 
-    /*async createCluster(coords, map, cluster) {
-        console.log('test here');
+    async createCluster(coords, map, cluster) {
         const placemark = new ymaps.Placemark(coords);
         cluster.add(placemark);
         map.geoObjects.add(this.cluster);
-    }*/
+    }
 }
