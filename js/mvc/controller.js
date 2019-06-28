@@ -18,9 +18,10 @@ export default class {
         const points = await this.sm.parseStorage();
 
         for(let point of points){
-            let reviews = point.reviews;
+            let reviews = point.reviews.reverse();
             reviews.forEach(async (review, i) =>{
-                await this.createCluster(point.coords, this.yandexApi, this.cluster, reviews, i);
+
+                await this.createCluster(point.coords, this.yandexApi, this.cluster, point, i);
             });
 
         }
@@ -136,7 +137,7 @@ export default class {
                     await this.sm.commentAdd(pointAround, data);
 
 
-                    await this.createCluster(data.coords, this.yandexApi, this.cluster, data.reviews);
+                    await this.createCluster(data.coords, this.yandexApi, this.cluster, data);
 
 
 
@@ -149,9 +150,14 @@ export default class {
     }
 
     async createCluster(coords, map, cluster, data, i = 0) {
-        console.log(data[i]);
-        const placemark = new ymaps.Placemark(coords, data[i]);
-        cluster.add(placemark);
+
+        var copy = Object.assign({}, data);
+
+        copy.reviews = data.reviews[i];
+        console.log(copy.reviews);
+        const placemark = await new ymaps.Placemark(coords, copy);
+        await cluster.add(placemark);
+
         map.geoObjects.add(this.cluster);
     }
 }
