@@ -19,8 +19,8 @@ export default class {
 
         for(let point of points){
             let reviews = point.reviews;
-            reviews.forEach(async review=>{
-                await this.createCluster(point.coords, this.yandexApi, this.cluster);
+            reviews.forEach(async (review, i) =>{
+                await this.createCluster(point.coords, this.yandexApi, this.cluster, reviews, i);
             });
 
         }
@@ -30,7 +30,6 @@ export default class {
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
-            console.log(pointAddress);
             const data = {
                 address: pointAddress,
                 coords: pointCoords,
@@ -109,7 +108,7 @@ export default class {
                         minute: 'numeric',
                         second: 'numeric'
                     };
-                    console.log(coords);
+
                     const pointAround =  coords.map( coord => parseFloat(coord).toFixed(2));
 
                     const data = {
@@ -128,14 +127,18 @@ export default class {
 
                     };
 
-                    //reviewsList.innerHTML = this.sm.newComment(data.reviews);
+
                     reviewsList.appendChild(this.sm.newComment(data.reviews));
                     if(reviewsEmpty){
                         reviewsEmpty.parentNode.removeChild(reviewsEmpty);
                     }
 
                     await this.sm.commentAdd(pointAround, data);
-                    await this.createCluster(data.coords, this.yandexApi, this.cluster);
+
+
+                    await this.createCluster(data.coords, this.yandexApi, this.cluster, data.reviews);
+
+
 
                 }
             }
@@ -145,8 +148,9 @@ export default class {
 
     }
 
-    async createCluster(coords, map, cluster) {
-        const placemark = new ymaps.Placemark(coords);
+    async createCluster(coords, map, cluster, data, i = 0) {
+        console.log(data[i]);
+        const placemark = new ymaps.Placemark(coords, data[i]);
         cluster.add(placemark);
         map.geoObjects.add(this.cluster);
     }

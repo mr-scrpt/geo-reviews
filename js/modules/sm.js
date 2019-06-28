@@ -49,7 +49,7 @@ module.exports = class {
         if(!spot){
             console.log('новый адрес!');
             localStorage.setItem(name, JSON.stringify(data));
-            console.log(data);
+
         }else { // Если место существует в localstorage, то добавляем к уде имеющимся отзывам - новый
 
             let reviews = JSON.parse(spot);

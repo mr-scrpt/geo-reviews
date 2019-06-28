@@ -4,10 +4,24 @@ module.exports = class {
         return new Promise((resolve, reject) => ymaps.ready(resolve))
             .then(()=>{
                 this.map = new ymaps.Map('map', settings);
+
+                var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+                    // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
+
+                    '<h2 class="ballon__header-spot">{{ properties.spot }} {{properties.index}} Спот</h2>' +
+                    '<a class="ballon__header-address" href="#" data-coord="">{{ properties.address}} Адрес</a>' +
+
+                    '<div class="ballon__comment">{{ properties.reviews.comment }}</div>'+
+                    '<div class="ballon__data">{{ properties.address}}</div>'
+
+                );
+
                 this.cluster = new ymaps.Clusterer({
                     clusterDisableClickZoom: true,
-                    clusterBalloonContentLayout: 'cluster#balloonCarousel'
+                    clusterBalloonContentLayout: 'cluster#balloonCarousel',
+                    clusterBalloonItemContentLayout: customItemContentLayout,
                 });
+
 
                 return [this.map, this.cluster];
             })
@@ -126,38 +140,5 @@ module.exports = class {
 
 
     };
-
-    /*async addPlacemark () {
-        //const that = this;
-        const clusterNew = this.clusster;
-        const mapName = this.map;
-
-
-        const BalloonContentLayout = ymaps.templateLayoutFactory.createClass(
-            '<div style="margin: 10px;">' +
-            '<b>{{properties.name}}</b><br />' +
-            '<i id="count"></i> ' +
-            '<button id="counter-button"> +1 </button>' +
-            '</div>');
-
-
-        const placemark = new ymaps.Placemark([50, 36.24], {
-            name: 'Считаем'
-        }, {
-            layout: BalloonContentLayout,
-            // Запретим замену обычного балуна на балун-панель.
-            // Если не указывать эту опцию, на картах маленького размера откроется балун-панель.
-            balloonPanelMaxMapArea: 0
-        });
-
-       // mapName.geoObjects.add(placemark);
-
-        clusterNew.add(placemark);
-        mapName.geoObjects.add(clusterNew);
-
-
-
-
-    }*/
 
 };
