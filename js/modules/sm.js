@@ -61,4 +61,10 @@ module.exports = class {
         }
     }
 
+    async pointCoords(e, map){
+        const point = await map.getMapPosition(e);
+        const pointCoords = point.coords;
+        return  pointCoords.map( coord => parseFloat(coord).toFixed(2));
+    }
+
 }

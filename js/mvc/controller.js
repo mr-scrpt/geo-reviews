@@ -20,7 +20,6 @@ export default class {
         for(let point of points){
             let reviews = point.reviews.reverse();
             reviews.forEach(async (review, i) =>{
-
                 await this.createCluster(point.coords, this.yandexApi, this.cluster, point, i);
             });
 
@@ -31,6 +30,7 @@ export default class {
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAddress = this.point.address;
+
             const data = {
                 address: pointAddress,
                 coords: pointCoords,
@@ -39,11 +39,15 @@ export default class {
             if (this.balloon) {
                 this.balloon.balloon.close();
             }
+            if (this.cluster) {
+                this.cluster.balloon.close();
+            }
 
             this.balloon = await this.myApiMap.createBalloon(pointCoords, data);
         });
 
         this.cluster.events.add('click', async e => {
+
             this.point = await this.myApiMap.getMapPosition(e);
             const pointCoords = this.point.coords;
             const pointAround =  pointCoords.map( coord => parseFloat(coord).toFixed(2));
@@ -55,13 +59,27 @@ export default class {
             if (this.balloon) {
                 this.balloon.balloon.close();
             }
-            const object = e.get('target');
-            // Тут заберем данные из локалсторедж и поло
-            if (!object.getGeoObjects) {
 
+
+
+            //console.log(e.originalEvent.currentTarget.balloon);
+            //console.log(e);
+            const object = e.get('target');
+
+            //console.log('test here');
+
+
+            if (!object.getGeoObjects) {
+                this.cluster.balloon.close();
                 this.balloon = await this.myApiMap.createBalloon(object.geometry._coordinates, JSON.parse(data))
 
             }
+
+            // console.log(this.cluster.balloon);
+            // console.log(e.originalEvent.currentTarget.balloon);
+            // if (this.cluster.balloon !== e.originalEvent.currentTarget.balloon) {
+            //     this.cluster.balloon.close()
+            // }
 
         });
 
@@ -69,7 +87,8 @@ export default class {
 
 
         document.body.addEventListener('click', async e => {
-            if (e.target.classList.contains('button')){
+            const target = e.target;
+            if (target.classList.contains('button')){
                 e.preventDefault();
                 const address = document.querySelector('.popup__address').innerText;
                 const coords = document.querySelector('.form__coords').value.split(',');
@@ -112,6 +131,7 @@ export default class {
 
                     const pointAround =  coords.map( coord => parseFloat(coord).toFixed(2));
 
+
                     const data = {
                         'pointAround': pointAround,
                         'coords': coords,
@@ -143,7 +163,24 @@ export default class {
 
                 }
             }
+            if (target.classList.contains('ballon__header-address')){
+                e.preventDefault();
+                const coords = [...target.dataset.coord.split(',')];
 
+                const pointAround =  coords.map( coord => parseFloat(coord).toFixed(2));
+                const data = await localStorage.getItem(pointAround);
+
+
+                if (this.cluster) {
+                    this.cluster.balloon.close();
+                }
+                this.balloon = await this.myApiMap.createBalloon(coords, JSON.parse(data))
+
+
+
+
+
+            }
 
         })
 
@@ -154,7 +191,7 @@ export default class {
         var copy = Object.assign({}, data);
 
         copy.reviews = data.reviews[i];
-        console.log(copy.reviews);
+
         const placemark = await new ymaps.Placemark(coords, copy);
         await cluster.add(placemark);
 

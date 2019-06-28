@@ -6,11 +6,11 @@ module.exports = class {
                 this.map = new ymaps.Map('map', settings);
 
                 var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
-                    '<h2 class="ballon__header-spot">{{ properties.address}}</h2>' +
-                    '<a class="ballon__header-address" href="#" data-coord="">{{  properties.reviews.spot}}</a>' +
+                    '<h3 class="ballon__header-spot">{{  properties.reviews.spot}}</h3>' +
+                    '<a class="ballon__header-address" href="#" data-coord="{{  properties.coords}}">{{ properties.address}}</a>' +
 
                     '<div class="ballon__comment">{{ properties.reviews.comment }}</div>'+
-                    '<div class="ballon__data">{{ properties.address}}</div>'
+                    '<div class="ballon__data">{{ properties.reviews.data}}</div>'
                 );
 
                 this.cluster = new ymaps.Clusterer({
