@@ -18,16 +18,15 @@ module.exports = class {
 
     newComment(data){
         let [review] = data;
-        const reviewsItem = `
-            <div class="reviews__item">
+        const reviewsItem = document.createElement('div');
+        reviewsItem.classList.add('reviews__item');
+        reviewsItem.innerHTML = `            
                 <div class="reviews__header">
                 <span class="reviews__author">${review.name}</span>
                 <span class="reviews__spot">${review.spot}</span>
                 <span class="reviews__data">${review.data}</span>
                 </div>
-                <div class="reviews__text">${review.comment}</div>
-            </div>
-          
+                <div class="reviews__text">${review.comment}</div>          
         `;
 
         return reviewsItem;

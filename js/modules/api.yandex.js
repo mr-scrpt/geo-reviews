@@ -36,7 +36,7 @@ module.exports = class {
             '<div class="popup__reviews reviews">'+
             '<div class="reviews__list">'+
                 '{% if !reviews.length %}' +
-                'Отзывов нет!'+
+                '<div class="reviews__empty">Отзывов нет!</div>'+
                 '{% endif %}'+
             '{% for review in reviews %}' +
             '<div class="reviews__item">'+

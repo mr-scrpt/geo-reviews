@@ -45,9 +45,11 @@ export default class {
 
         this.cluster.events.add('click', async e => {
             this.point = await this.myApiMap.getMapPosition(e);
-            const pointAddress = await this.point.address;
-            const data = await localStorage.getItem(pointAddress);
-            console.log(pointAddress);
+            const pointCoords = this.point.coords;
+            const pointAround =  pointCoords.map( coord => parseFloat(coord).toFixed(2));
+            //const pointAddress = await this.point.address;
+            const data = await localStorage.getItem(pointAround);
+
 
 
             if (this.balloon) {
@@ -56,6 +58,7 @@ export default class {
             const object = e.get('target');
             // Тут заберем данные из локалсторедж и поло
             if (!object.getGeoObjects) {
+
                 this.balloon = await this.myApiMap.createBalloon(object.geometry._coordinates, JSON.parse(data))
 
             }
@@ -74,6 +77,7 @@ export default class {
                 const spot = document.querySelector('.form__spot').value;
                 const comment = document.querySelector('.form__comment').value;
                 const reviewsList = document.querySelector('.reviews__list');
+                const reviewsEmpty = document.querySelector('.reviews__empty');
 
                 const form = document.querySelector('.form');
 
@@ -99,14 +103,17 @@ export default class {
                     const dataOptions = {
                         year: 'numeric',
                         month: 'numeric',
-
                         weekday: 'long',
                         timezone: 'UTC',
                         hour: 'numeric',
                         minute: 'numeric',
                         second: 'numeric'
                     };
+                    console.log(coords);
+                    const pointAround =  coords.map( coord => parseFloat(coord).toFixed(2));
+
                     const data = {
+                        'pointAround': pointAround,
                         'coords': coords,
                         'address': address,
                         'reviews': [
@@ -120,9 +127,14 @@ export default class {
                         'yandexMapPointsObject': true,
 
                     };
-                    // console.log(this.sm.newComment(data.reviews));
-                    reviewsList.innerHTML = this.sm.newComment(data.reviews);
-                    await this.sm.commentAdd(data.address, data);
+
+                    //reviewsList.innerHTML = this.sm.newComment(data.reviews);
+                    reviewsList.appendChild(this.sm.newComment(data.reviews));
+                    if(reviewsEmpty){
+                        reviewsEmpty.parentNode.removeChild(reviewsEmpty);
+                    }
+
+                    await this.sm.commentAdd(pointAround, data);
                     await this.createCluster(data.coords, this.yandexApi, this.cluster);
 
                 }
